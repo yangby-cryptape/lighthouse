@@ -1,4 +1,10 @@
 //! Library for safe arithmetic on integers, avoiding overflow and division by zero.
+
+#![no_std]
+
+#[cfg(test)]
+extern crate alloc;
+
 mod iter;
 
 pub use iter::SafeArithIter;
@@ -10,7 +16,7 @@ pub enum ArithError {
     DivisionByZero,
 }
 
-pub type Result<T> = std::result::Result<T, ArithError>;
+pub type Result<T> = core::result::Result<T, ArithError>;
 
 macro_rules! assign_method {
     ($name:ident, $op:ident, $doc_op:expr) => {

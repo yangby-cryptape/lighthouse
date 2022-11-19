@@ -5,10 +5,12 @@
 //! Quotes can be optional during decoding. If the length of the `Vec` is greater than `N`, deserialization fails.
 
 use crate::VariableList;
+use alloc::vec::Vec;
+use alloc::{format, vec};
+use core::marker::PhantomData;
 use eth2_serde_utils::quoted_u64_vec::QuotedIntWrapper;
 use serde::ser::SerializeSeq;
 use serde::{Deserializer, Serializer};
-use std::marker::PhantomData;
 use typenum::Unsigned;
 
 pub struct QuotedIntVarListVisitor<N> {
@@ -21,7 +23,7 @@ where
 {
     type Value = VariableList<u64, N>;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(formatter, "a list of quoted or unquoted integers")
     }
 
@@ -84,6 +86,7 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
+    use alloc::vec;
     use serde_derive::{Deserialize, Serialize};
     use typenum::U4;
 

@@ -4,6 +4,8 @@
 //!
 //! Quotes can be optional during decoding.
 
+use alloc::vec;
+use alloc::vec::Vec;
 use serde::ser::SerializeSeq;
 use serde::{Deserializer, Serializer};
 use serde_derive::{Deserialize, Serialize};
@@ -19,7 +21,7 @@ pub struct QuotedIntVecVisitor;
 impl<'a> serde::de::Visitor<'a> for QuotedIntVecVisitor {
     type Value = Vec<u64>;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(formatter, "a list of quoted or unquoted integers")
     }
 

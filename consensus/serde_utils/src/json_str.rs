@@ -1,4 +1,5 @@
 //! Serialize a datatype as a JSON-blob within a single string.
+use alloc::string::String;
 use serde::{
     de::{DeserializeOwned, Error as _},
     ser::Error as _,

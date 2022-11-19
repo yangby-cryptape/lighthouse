@@ -1,10 +1,12 @@
 use crate::tree_hash::vec_tree_hash_root;
 use crate::Error;
+use alloc::vec::Vec;
+use alloc::{format, vec};
+use core::marker::PhantomData;
+use core::ops::{Deref, DerefMut, Index, IndexMut};
+use core::slice::SliceIndex;
 use derivative::Derivative;
 use serde_derive::{Deserialize, Serialize};
-use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut, Index, IndexMut};
-use std::slice::SliceIndex;
 use tree_hash::Hash256;
 use typenum::Unsigned;
 
@@ -48,7 +50,7 @@ pub use typenum;
 /// assert!(long.push(6).is_err());
 /// ```
 #[derive(Debug, Clone, Serialize, Deserialize, Derivative)]
-#[derivative(PartialEq, Eq, Hash(bound = "T: std::hash::Hash"))]
+#[derivative(PartialEq, Eq, Hash(bound = "T: core::hash::Hash"))]
 #[serde(transparent)]
 pub struct VariableList<T, N> {
     vec: Vec<T>,
@@ -169,7 +171,7 @@ impl<T, N: Unsigned> DerefMut for VariableList<T, N> {
 
 impl<'a, T, N: Unsigned> IntoIterator for &'a VariableList<T, N> {
     type Item = &'a T;
-    type IntoIter = std::slice::Iter<'a, T>;
+    type IntoIter = core::slice::Iter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
@@ -268,7 +270,7 @@ impl<'a, T: arbitrary::Arbitrary<'a>, N: 'static + Unsigned> arbitrary::Arbitrar
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let max_size = N::to_usize();
         let rand = usize::arbitrary(u)?;
-        let size = std::cmp::min(rand, max_size);
+        let size = core::cmp::min(rand, max_size);
         let mut vec: Vec<T> = Vec::with_capacity(size);
         for _ in 0..size {
             vec.push(<T>::arbitrary(u)?);
@@ -347,7 +349,7 @@ mod test {
         assert_eq!(<VariableList<u16, U2> as Encode>::ssz_fixed_len(), 4);
     }
 
-    fn round_trip<T: Encode + Decode + std::fmt::Debug + PartialEq>(item: T) {
+    fn round_trip<T: Encode + Decode + core::fmt::Debug + PartialEq>(item: T) {
         let encoded = &item.as_ssz_bytes();
         assert_eq!(item.ssz_bytes_len(), encoded.len());
         assert_eq!(T::from_ssz_bytes(encoded), Ok(item));

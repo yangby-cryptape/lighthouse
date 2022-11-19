@@ -2,9 +2,11 @@
 //!
 //! E.g., `0` serializes as `"0x0000000000000000"`.
 
+use alloc::vec::Vec;
+use alloc::{format, vec};
+use core::fmt;
 use serde::de::{self, Error, Visitor};
 use serde::{Deserializer, Serializer};
-use std::fmt;
 
 const BYTES_LEN: usize = 8;
 

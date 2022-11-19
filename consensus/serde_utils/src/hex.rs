@@ -1,7 +1,10 @@
 //! Provides utilities for parsing 0x-prefixed hex strings.
 
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::fmt;
 use serde::de::{self, Visitor};
-use std::fmt;
 
 /// Encode `data` as a 0x-prefixed hex string.
 pub fn encode<T: AsRef<[u8]>>(data: T) -> String {
@@ -59,6 +62,7 @@ impl<'de> Visitor<'de> for HexVisitor {
 #[cfg(test)]
 mod test {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn encoding() {

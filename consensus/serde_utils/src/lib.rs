@@ -1,3 +1,7 @@
+#![no_std]
+
+extern crate alloc;
+
 mod quoted_int;
 
 pub mod fixed_bytes_hex;
