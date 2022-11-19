@@ -1,7 +1,7 @@
 use crate::{get_zero_hash, Hash256, HASHSIZE};
+use core::mem;
 use eth2_hashing::{Context, Sha256Context, HASH_LEN};
 use smallvec::{smallvec, SmallVec};
-use std::mem;
 
 type SmallVec8<T> = SmallVec<[T; 8]>;
 
@@ -200,7 +200,7 @@ impl MerkleHasher {
     pub fn write(&mut self, bytes: &[u8]) -> Result<(), Error> {
         let mut ptr = 0;
         while ptr <= bytes.len() {
-            let slice = &bytes[ptr..std::cmp::min(bytes.len(), ptr + HASHSIZE)];
+            let slice = &bytes[ptr..core::cmp::min(bytes.len(), ptr + HASHSIZE)];
 
             if self.buffer.is_empty() && slice.len() == HASHSIZE {
                 self.process_leaf(slice)?;
@@ -361,6 +361,9 @@ impl MerkleHasher {
 mod test {
     use super::*;
     use crate::merkleize_padded;
+
+    use alloc::vec;
+    use alloc::vec::Vec;
 
     /// This test is just to ensure that the stack size of the `Context` remains the same. We choose
     /// our smallvec size based upon this, so it's good to know if it suddenly changes in size.

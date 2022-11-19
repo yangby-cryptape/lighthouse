@@ -169,6 +169,8 @@ impl TreeHash for H256 {
 #[cfg(test)]
 mod test {
     use super::*;
+    use alloc::vec;
+    use alloc::vec::Vec;
 
     #[test]
     fn bool() {

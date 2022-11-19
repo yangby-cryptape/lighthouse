@@ -29,6 +29,7 @@ macro_rules! four_byte_option_impl {
         #[allow(dead_code)]
         mod $mod_name {
             use super::*;
+            extern crate alloc;
 
             pub mod encode {
                 use super::*;
@@ -67,7 +68,7 @@ macro_rules! four_byte_option_impl {
                 }
 
                 pub fn as_ssz_bytes(opt: &Option<$type>) -> Vec<u8> {
-                    let mut buf = vec![];
+                    let mut buf = alloc::vec![];
 
                     ssz_append(opt, &mut buf);
 
@@ -104,7 +105,7 @@ macro_rules! four_byte_option_impl {
                     } else if index == 1 {
                         Ok(Some(<$type as ssz::Decode>::from_ssz_bytes(value_bytes)?))
                     } else {
-                        Err(DecodeError::BytesInvalid(format!(
+                        Err(DecodeError::BytesInvalid(alloc::format!(
                             "{} is not a valid union index for Option<T>",
                             index
                         )))
@@ -125,8 +126,10 @@ pub fn read_four_byte_union_selector(bytes: &[u8]) -> Result<usize, DecodeError>
 
 #[cfg(test)]
 mod test {
+
     use super::*;
     use crate as ssz;
+    use alloc::vec;
     use ssz_derive::{Decode, Encode};
 
     type VecU16 = Vec<u16>;
@@ -160,7 +163,7 @@ mod test {
         assert_eq!(impl_vec_u16::decode::from_ssz_bytes(&bytes).unwrap(), item);
     }
 
-    fn round_trip<T: Encode + Decode + std::fmt::Debug + PartialEq>(items: Vec<T>) {
+    fn round_trip<T: Encode + Decode + core::fmt::Debug + PartialEq>(items: Vec<T>) {
         for item in items {
             let encoded = &item.as_ssz_bytes();
             assert_eq!(item.ssz_bytes_len(), encoded.len());

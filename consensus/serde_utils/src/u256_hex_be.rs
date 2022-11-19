@@ -1,9 +1,11 @@
 use ethereum_types::U256;
 
+use alloc::format;
+use alloc::string::{String, ToString};
+use core::fmt;
+use core::str::FromStr;
 use serde::de::Visitor;
 use serde::{de, Deserializer, Serialize, Serializer};
-use std::fmt;
-use std::str::FromStr;
 
 pub fn serialize<S>(num: &U256, serializer: S) -> Result<S::Ok, S::Error>
 where

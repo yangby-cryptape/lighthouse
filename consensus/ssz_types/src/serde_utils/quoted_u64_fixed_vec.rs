@@ -6,10 +6,11 @@
 
 use crate::serde_utils::quoted_u64_var_list::deserialize_max;
 use crate::FixedVector;
+use alloc::format;
+use core::marker::PhantomData;
 use eth2_serde_utils::quoted_u64_vec::QuotedIntWrapper;
 use serde::ser::SerializeSeq;
 use serde::{Deserializer, Serializer};
-use std::marker::PhantomData;
 use typenum::Unsigned;
 
 pub struct QuotedIntFixedVecVisitor<N> {
@@ -22,7 +23,7 @@ where
 {
     type Value = FixedVector<u64, N>;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(formatter, "a list of quoted or unquoted integers")
     }
 
@@ -61,6 +62,7 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
+    use alloc::vec;
     use serde_derive::{Deserialize, Serialize};
     use typenum::U4;
 

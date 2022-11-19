@@ -1,5 +1,7 @@
 use crate::tree_hash::bitfield_bytes_tree_hash_root;
 use crate::Error;
+use alloc::format;
+use alloc::vec::Vec;
 use core::marker::PhantomData;
 use derivative::Derivative;
 use eth2_serde_utils::hex::{encode as hex_encode, PrefixedHexVisitor};
@@ -212,7 +214,7 @@ impl<N: Unsigned + Clone> Bitfield<Variable<N>> {
     ///
     /// Return a new BitList with length equal to the shorter of the two inputs.
     pub fn intersection(&self, other: &Self) -> Self {
-        let min_len = std::cmp::min(self.len(), other.len());
+        let min_len = core::cmp::min(self.len(), other.len());
         let mut result = Self::with_capacity(min_len).expect("min len always less than N");
         // Bitwise-and the bytes together, starting from the left of each vector. This takes care
         // of masking out any entries beyond `min_len` as well, assuming the bitfield doesn't
@@ -227,7 +229,7 @@ impl<N: Unsigned + Clone> Bitfield<Variable<N>> {
     ///
     /// Return a new BitList with length equal to the longer of the two inputs.
     pub fn union(&self, other: &Self) -> Self {
-        let max_len = std::cmp::max(self.len(), other.len());
+        let max_len = core::cmp::max(self.len(), other.len());
         let mut result = Self::with_capacity(max_len).expect("max len always less than N");
         for i in 0..result.bytes.len() {
             result.bytes[i] =
@@ -456,7 +458,7 @@ impl<T: BitfieldBehaviour> Bitfield<T> {
 
     /// Compute the difference of this Bitfield and another of potentially different length.
     pub fn difference_inplace(&mut self, other: &Self) {
-        let min_byte_len = std::cmp::min(self.bytes.len(), other.bytes.len());
+        let min_byte_len = core::cmp::min(self.bytes.len(), other.bytes.len());
 
         for i in 0..min_byte_len {
             self.bytes[i] &= !other.bytes[i];
@@ -490,7 +492,7 @@ impl<T: BitfieldBehaviour> Bitfield<T> {
 ///
 /// `bit_len == 0` requires a single byte.
 fn bytes_for_bit_len(bit_len: usize) -> usize {
-    std::cmp::max(1, (bit_len + 7) / 8)
+    core::cmp::max(1, (bit_len + 7) / 8)
 }
 
 /// An iterator over the bits in a `Bitfield`.
@@ -669,7 +671,7 @@ impl<N: 'static + Unsigned> arbitrary::Arbitrary<'_> for Bitfield<Variable<N>> {
     fn arbitrary(u: &mut arbitrary::Unstructured<'_>) -> arbitrary::Result<Self> {
         let max_size = N::to_usize();
         let rand = usize::arbitrary(u)?;
-        let size = std::cmp::min(rand, max_size);
+        let size = core::cmp::min(rand, max_size);
         let mut vec = smallvec![0u8; size];
         u.fill_buffer(&mut vec)?;
         Ok(Self::from_bytes(vec).map_err(|_| arbitrary::Error::IncorrectFormat)?)
@@ -680,6 +682,7 @@ impl<N: 'static + Unsigned> arbitrary::Arbitrary<'_> for Bitfield<Variable<N>> {
 mod bitvector {
     use super::*;
     use crate::BitVector;
+    use alloc::vec;
 
     pub type BitVector0 = BitVector<typenum::U0>;
     pub type BitVector1 = BitVector<typenum::U1>;
@@ -826,7 +829,7 @@ mod bitvector {
         assert_round_trip(b);
     }
 
-    fn assert_round_trip<T: Encode + Decode + PartialEq + std::fmt::Debug>(t: T) {
+    fn assert_round_trip<T: Encode + Decode + PartialEq + core::fmt::Debug>(t: T) {
         assert_eq!(T::from_ssz_bytes(&t.as_ssz_bytes()).unwrap(), t);
     }
 
@@ -852,7 +855,7 @@ mod bitvector {
     // Ensure that stack size of a BitVector is manageable.
     #[test]
     fn size_of() {
-        assert_eq!(std::mem::size_of::<BitVector64>(), SMALLVEC_LEN + 24);
+        assert_eq!(core::mem::size_of::<BitVector64>(), SMALLVEC_LEN + 24);
     }
 }
 
@@ -861,6 +864,7 @@ mod bitvector {
 mod bitlist {
     use super::*;
     use crate::BitList;
+    use alloc::vec;
 
     pub type BitList0 = BitList<typenum::U0>;
     pub type BitList1 = BitList<typenum::U1>;
@@ -1001,7 +1005,7 @@ mod bitlist {
         }
     }
 
-    fn assert_round_trip<T: Encode + Decode + PartialEq + std::fmt::Debug>(t: T) {
+    fn assert_round_trip<T: Encode + Decode + PartialEq + core::fmt::Debug>(t: T) {
         assert_eq!(T::from_ssz_bytes(&t.as_ssz_bytes()).unwrap(), t);
     }
 
@@ -1327,6 +1331,6 @@ mod bitlist {
     // Ensure that the stack size of a BitList is manageable.
     #[test]
     fn size_of() {
-        assert_eq!(std::mem::size_of::<BitList1024>(), SMALLVEC_LEN + 24);
+        assert_eq!(core::mem::size_of::<BitList1024>(), SMALLVEC_LEN + 24);
     }
 }
