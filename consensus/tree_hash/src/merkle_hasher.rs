@@ -365,17 +365,6 @@ mod test {
     use alloc::vec;
     use alloc::vec::Vec;
 
-    /// This test is just to ensure that the stack size of the `Context` remains the same. We choose
-    /// our smallvec size based upon this, so it's good to know if it suddenly changes in size.
-    #[test]
-    fn context_size() {
-        assert_eq!(
-            mem::size_of::<HalfNode>(),
-            120,
-            "Halfnode size should be as expected"
-        );
-    }
-
     fn compare_with_reference(leaves: &[Hash256], depth: usize) {
         let reference_bytes = leaves
             .iter()

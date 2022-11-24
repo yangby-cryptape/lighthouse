@@ -14,10 +14,10 @@ eth2_ssz_derive = { path = "../ssz_derive" }
 
 [dependencies]
 ethereum-types = { version = "0.12.1", default-features = false, features = ["rlp", "serialize"] }
-eth2_hashing = { path = "../../crypto/eth2_hashing", default-features = false, features = ["zero_hash_cache"] }
+eth2_hashing = { path = "../../crypto/eth2_hashing" }
 smallvec = "1.6.1"
 
 [features]
 default = ["std"]
-std = ["ethereum-types/std", "eth2_hashing/std"]
+std = ["ethereum-types/std"]
 arbitrary = ["ethereum-types/arbitrary"]

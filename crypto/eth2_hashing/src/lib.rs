@@ -10,28 +10,46 @@
 #![no_std]
 
 extern crate alloc;
-
 use alloc::vec::Vec;
 
-use sha2::Digest;
+#[cfg(feature = "sha2_impl")]
+#[path = "sha2_impl.rs"]
+mod sha256;
+
+#[cfg(feature = "rust_impl")]
+#[path = "rust_impl.rs"]
+mod sha256;
+
+#[cfg(any(feature = "c_bitcoin_impl", feature = "c_mbedtls_impl"))]
+pub mod raw;
+
+#[cfg(feature = "c_bitcoin_impl")]
+#[path = "c_bitcoin_impl.rs"]
+mod sha256;
+
+#[cfg(feature = "c_mbedtls_impl")]
+#[path = "c_mbedtls_impl.rs"]
+mod sha256;
 
 /// Length of a SHA256 hash in bytes.
 pub const HASH_LEN: usize = 32;
 
 /// Returns the digest of `input` using the best available implementation.
 pub fn hash(input: &[u8]) -> Vec<u8> {
-    sha2::Sha256::digest(input).into_iter().collect()
+    hash_fixed(input).into_iter().collect()
 }
 
 /// Hash function returning a fixed-size array (to save on allocations).
 ///
 /// Uses the best available implementation based on CPU features.
 pub fn hash_fixed(input: &[u8]) -> [u8; HASH_LEN] {
-    sha2::Sha256::digest(input).into()
+    let mut ctxt = Context::new();
+    ctxt.update(input);
+    ctxt.finalize()
 }
 
 /// Compute the hash of two slices concatenated.
-pub fn hash32_concat(h1: &[u8], h2: &[u8]) -> [u8; 32] {
+pub fn hash32_concat(h1: &[u8], h2: &[u8]) -> [u8; HASH_LEN] {
     let mut ctxt = Context::new();
     ctxt.update(h1);
     ctxt.update(h2);
@@ -58,13 +76,13 @@ pub trait Sha256 {
 
 /// Context encapsulating all implemenation contexts.
 pub struct Context {
-    inner: sha2::Sha256,
+    inner: sha256::Context,
 }
 
 impl Sha256Context for Context {
     fn new() -> Self {
         Self {
-            inner: sha2::Digest::new(),
+            inner: sha256::Context::new(),
         }
     }
 
@@ -300,12 +318,21 @@ mod tests {
         assert_eq!(expected, output);
     }
 
+    #[cfg(feature = "zero_hash_cache")]
     mod zero_hash {
         use super::*;
 
         #[test]
-        fn zero_hash_zero() {
-            assert_eq!(ZERO_HASHES[0], [0; 32]);
+        fn test_zero_hashes() {
+            let mut hash = [0u8; HASH_LEN];
+            for i in 0..=ZERO_HASHES_MAX_INDEX {
+                assert_eq!(
+                    hash, ZERO_HASHES[i],
+                    "the {}-th hash in ZERO_HASHES is not matched with the result",
+                    i
+                );
+                hash = hash32_concat(&hash, &hash);
+            }
         }
     }
 }
