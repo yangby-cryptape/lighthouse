@@ -16,5 +16,5 @@ quickcheck_macros = "0.9.1"
 
 [features]
 default = ["std"]
-std = ["ethereum-types/std", "eth2_hashing/std", "lazy_static"]
+std = ["ethereum-types/std", "lazy_static"]
 arbitrary = ["ethereum-types/arbitrary"]

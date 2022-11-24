@@ -6,9 +6,6 @@ edition = "2021"
 license = "Apache-2.0"
 description = "Hashing primitives used in Ethereum 2.0"
 
-[dependencies]
-sha2 = { version = "0.10.2", default-features = false, features = [] }
-
 [dev-dependencies]
 rustc-hex = "2.1.0"
 
@@ -16,6 +13,5 @@ rustc-hex = "2.1.0"
 wasm-bindgen-test = "0.3.18"
 
 [features]
-default = ["std", "zero_hash_cache"]
-std = ["sha2/std"]
+default = ["zero_hash_cache"]
 zero_hash_cache = []

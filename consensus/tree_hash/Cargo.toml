@@ -19,5 +19,5 @@ smallvec = "1.6.1"
 
 [features]
 default = ["std"]
-std = ["ethereum-types/std", "eth2_hashing/std"]
+std = ["ethereum-types/std"]
 arbitrary = ["ethereum-types/arbitrary"]

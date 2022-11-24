@@ -11,23 +11,26 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
+mod sha256;
 
-use sha2::Digest;
+use crate::sha256::SHA256HashPrototype as _;
+use alloc::vec::Vec;
 
 /// Length of a SHA256 hash in bytes.
 pub const HASH_LEN: usize = 32;
 
 /// Returns the digest of `input` using the best available implementation.
 pub fn hash(input: &[u8]) -> Vec<u8> {
-    sha2::Sha256::digest(input).into_iter().collect()
+    hash_fixed(input).into_iter().collect()
 }
 
 /// Hash function returning a fixed-size array (to save on allocations).
 ///
 /// Uses the best available implementation based on CPU features.
 pub fn hash_fixed(input: &[u8]) -> [u8; HASH_LEN] {
-    sha2::Sha256::digest(input).into()
+    let mut hasher = sha256::SHA256Hash::new();
+    hasher.update(input);
+    hasher.finalize()
 }
 
 /// Compute the hash of two slices concatenated.
@@ -58,13 +61,13 @@ pub trait Sha256 {
 
 /// Context encapsulating all implemenation contexts.
 pub struct Context {
-    inner: sha2::Sha256,
+    inner: sha256::SHA256Hash,
 }
 
 impl Sha256Context for Context {
     fn new() -> Self {
         Self {
-            inner: sha2::Digest::new(),
+            inner: sha256::SHA256Hash::new(),
         }
     }
 
