@@ -37,6 +37,10 @@
 //!
 //! ```
 
+#![no_std]
+
+extern crate alloc;
+
 #[macro_use]
 mod bitfield;
 mod fixed_vector;

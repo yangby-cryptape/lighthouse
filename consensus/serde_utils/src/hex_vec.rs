@@ -3,6 +3,8 @@
 //! E.g., `vec![0, 1, 2, 3]` serializes as `"0x00010203"`.
 
 use crate::hex::PrefixedHexVisitor;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use serde::{Deserializer, Serializer};
 
 pub fn serialize<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>

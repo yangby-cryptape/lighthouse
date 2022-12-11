@@ -1,3 +1,5 @@
+use alloc::vec;
+
 use super::*;
 
 mod impls;

@@ -1,17 +1,66 @@
+#![no_std]
+
+extern crate alloc;
+
+#[cfg(feature = "std")]
+extern crate std;
+
+use alloc::boxed::Box;
+use alloc::vec;
+use alloc::vec::Vec;
 use eth2_hashing::{hash, hash32_concat, ZERO_HASHES};
 use ethereum_types::H256;
+#[cfg(feature = "lazy_static")]
 use lazy_static::lazy_static;
 use safe_arith::ArithError;
 
 const MAX_TREE_DEPTH: usize = 32;
 const EMPTY_SLICE: &[H256] = &[];
 
+#[cfg(feature = "lazy_static")]
 lazy_static! {
     /// Zero nodes to act as "synthetic" left and right subtrees of other zero nodes.
     static ref ZERO_NODES: Vec<MerkleTree> = {
         (0..=MAX_TREE_DEPTH).map(MerkleTree::Zero).collect()
     };
 }
+
+#[cfg(not(feature = "lazy_static"))]
+static ZERO_NODES: [MerkleTree; MAX_TREE_DEPTH + 1] = [
+    MerkleTree::Zero(0),
+    MerkleTree::Zero(1),
+    MerkleTree::Zero(2),
+    MerkleTree::Zero(3),
+    MerkleTree::Zero(4),
+    MerkleTree::Zero(5),
+    MerkleTree::Zero(6),
+    MerkleTree::Zero(7),
+    MerkleTree::Zero(8),
+    MerkleTree::Zero(9),
+    MerkleTree::Zero(10),
+    MerkleTree::Zero(11),
+    MerkleTree::Zero(12),
+    MerkleTree::Zero(13),
+    MerkleTree::Zero(14),
+    MerkleTree::Zero(15),
+    MerkleTree::Zero(16),
+    MerkleTree::Zero(17),
+    MerkleTree::Zero(18),
+    MerkleTree::Zero(19),
+    MerkleTree::Zero(20),
+    MerkleTree::Zero(21),
+    MerkleTree::Zero(22),
+    MerkleTree::Zero(23),
+    MerkleTree::Zero(24),
+    MerkleTree::Zero(25),
+    MerkleTree::Zero(26),
+    MerkleTree::Zero(27),
+    MerkleTree::Zero(28),
+    MerkleTree::Zero(29),
+    MerkleTree::Zero(30),
+    MerkleTree::Zero(31),
+    MerkleTree::Zero(32),
+];
 
 /// Right-sparse Merkle tree.
 ///
@@ -324,7 +373,9 @@ impl MerkleTree {
     }
 
     /// useful for debugging
+    #[cfg(feature = "std")]
     pub fn print_node(&self, mut space: u32) {
+        use std::{format, print, println};
         const SPACES: u32 = 10;
         space += SPACES;
         let (pair, text) = match self {

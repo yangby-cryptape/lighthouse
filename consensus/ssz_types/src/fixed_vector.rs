@@ -1,10 +1,12 @@
 use crate::tree_hash::vec_tree_hash_root;
 use crate::Error;
+use alloc::vec::Vec;
+use alloc::{format, vec};
+use core::marker::PhantomData;
+use core::ops::{Deref, DerefMut, Index, IndexMut};
+use core::slice::SliceIndex;
 use derivative::Derivative;
 use serde_derive::{Deserialize, Serialize};
-use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut, Index, IndexMut};
-use std::slice::SliceIndex;
 use tree_hash::Hash256;
 use typenum::Unsigned;
 
@@ -41,12 +43,12 @@ pub use typenum;
 /// assert_eq!(&short[..], &[1, 2, 3]);
 ///
 /// // Create a `FixedVector` from a `Vec` that is too short and the missing values are created
-/// // using `std::default::Default`.
+/// // using `core::default::Default`.
 /// let long: FixedVector<_, typenum::U5> = FixedVector::from(base);
 /// assert_eq!(&long[..], &[1, 2, 3, 4, 0]);
 /// ```
 #[derive(Debug, Clone, Serialize, Deserialize, Derivative)]
-#[derivative(PartialEq, Hash(bound = "T: std::hash::Hash"))]
+#[derivative(PartialEq, Hash(bound = "T: core::hash::Hash"))]
 #[serde(transparent)]
 pub struct FixedVector<T, N> {
     vec: Vec<T>,
@@ -365,7 +367,7 @@ mod test {
         assert_eq!(<FixedVector<u16, U2> as Encode>::ssz_fixed_len(), 4);
     }
 
-    fn ssz_round_trip<T: Encode + Decode + std::fmt::Debug + PartialEq>(item: T) {
+    fn ssz_round_trip<T: Encode + Decode + core::fmt::Debug + PartialEq>(item: T) {
         let encoded = &item.as_ssz_bytes();
         assert_eq!(item.ssz_bytes_len(), encoded.len());
         assert_eq!(T::from_ssz_bytes(encoded), Ok(item));

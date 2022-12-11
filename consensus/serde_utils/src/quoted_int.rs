@@ -4,11 +4,12 @@
 //!
 //! Quotes can be optional during decoding.
 
+use alloc::format;
+use core::convert::TryFrom;
+use core::marker::PhantomData;
 use ethereum_types::U256;
 use serde::{Deserializer, Serializer};
 use serde_derive::{Deserialize, Serialize};
-use std::convert::TryFrom;
-use std::marker::PhantomData;
 
 macro_rules! define_mod {
     ($int: ty, $visit_fn: ident) => {
@@ -26,7 +27,7 @@ macro_rules! define_mod {
         {
             type Value = T;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+            fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
                 if self.require_quotes {
                     write!(formatter, "a quoted integer")
                 } else {
@@ -163,7 +164,7 @@ pub mod quoted_u256 {
     impl<'de> serde::de::Visitor<'de> for U256Visitor {
         type Value = U256;
 
-        fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
             formatter.write_str("a quoted U256 integer")
         }
 

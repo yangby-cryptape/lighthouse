@@ -15,9 +15,11 @@ eth2_ssz = { version = "0.4.1", path = "../ssz" }
 eth2_ssz_derive = { version = "0.3.0", path = "../ssz_derive" }
 
 [dependencies]
-ethereum-types = "0.12.1"
-eth2_hashing = { version = "0.3.0", path = "../../crypto/eth2_hashing" }
+ethereum-types = { version = "0.12.1", default-features = false, features = ["rlp", "serialize"] }
+eth2_hashing = { version = "0.3.0", path = "../../crypto/eth2_hashing", default-features = false, features = ["zero_hash_cache"] }
 smallvec = "1.6.1"
 
 [features]
+default = ["std"]
+std = ["ethereum-types/std", "eth2_hashing/std"]
 arbitrary = ["ethereum-types/arbitrary"]

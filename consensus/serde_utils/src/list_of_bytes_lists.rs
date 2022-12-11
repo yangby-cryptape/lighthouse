@@ -5,6 +5,9 @@
 //! Quotes can be optional during decoding.
 
 use crate::hex;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 use serde::ser::SerializeSeq;
 use serde::{de, Deserializer, Serializer};
 
@@ -12,7 +15,7 @@ pub struct ListOfBytesListVisitor;
 impl<'a> serde::de::Visitor<'a> for ListOfBytesListVisitor {
     type Value = Vec<Vec<u8>>;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
         write!(formatter, "a list of 0x-prefixed byte lists")
     }
 

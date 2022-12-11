@@ -1,12 +1,14 @@
 use super::*;
 use crate::decode::try_from_iter::{TryCollect, TryFromIter};
+use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::format;
+use alloc::string::ToString;
+use alloc::sync::Arc;
+use core::iter::{self, FromIterator};
 use core::num::NonZeroUsize;
 use ethereum_types::{H160, H256, U128, U256};
 use itertools::process_results;
 use smallvec::SmallVec;
-use std::collections::{BTreeMap, BTreeSet};
-use std::iter::{self, FromIterator};
-use std::sync::Arc;
 
 macro_rules! impl_decodable_for_uint {
     ($type: ident, $bit_size: expr) => {
@@ -26,7 +28,7 @@ macro_rules! impl_decodable_for_uint {
                 if len != expected {
                     Err(DecodeError::InvalidByteLength { len, expected })
                 } else {
-                    let mut array: [u8; $bit_size / 8] = std::default::Default::default();
+                    let mut array: [u8; $bit_size / 8] = core::default::Default::default();
                     array.clone_from_slice(bytes);
 
                     Ok(Self::from_le_bytes(array))
@@ -524,6 +526,8 @@ pub fn decode_list_of_variable_length_items<T: Decode, Container: TryFromIter<T>
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
+    use alloc::vec::Vec;
 
     // Note: decoding of valid bytes is generally tested "indirectly" in the `/tests` dir, by
     // encoding then decoding the element.

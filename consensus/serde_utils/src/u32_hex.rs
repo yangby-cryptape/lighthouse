@@ -3,6 +3,7 @@
 //! E.g., `0` serializes as `"0x00000000"`.
 
 use crate::bytes_4_hex;
+use alloc::format;
 use serde::{Deserializer, Serializer};
 
 pub fn serialize<S>(num: &u32, serializer: S) -> Result<S::Ok, S::Error>

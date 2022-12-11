@@ -19,6 +19,8 @@ where
 mod test {
     use super::*;
     use crate::ArithError;
+    use alloc::vec;
+    use alloc::vec::Vec;
 
     #[test]
     fn empty_sum() {
