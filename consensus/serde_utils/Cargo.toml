@@ -11,7 +11,7 @@ serde = { version = "1.0.116", default-features = false, features = ["derive"] }
 serde_derive = "1.0.116"
 serde_json = { version = "1.0.58", default-features = false, features = ["alloc"] }
 hex = { version = "0.4.2", default-features = false, features = ["alloc"] }
-ethereum-types = { version = "0.12.1", default-features = false, features = ["rlp", "serialize"] }
+ethereum-types = { version = "0.14.1", default-features = false, features = ["rlp", "serialize"] }
 
 [features]
 default = ["std"]

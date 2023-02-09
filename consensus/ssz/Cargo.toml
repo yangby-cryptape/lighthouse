@@ -11,10 +11,10 @@ name = "ssz"
 
 [dev-dependencies]
 eth2_ssz_derive = { version = "0.3.0", path = "../ssz_derive" }
-ethereum-types = { version = "0.12.1" }
+ethereum-types = { version = "0.14.1" }
 
 [dependencies]
-ethereum-types = { version = "0.12.1", default-features = false, features = ["rlp", "serialize"] }
+ethereum-types = { version = "0.14.1", default-features = false, features = ["rlp", "serialize"] }
 smallvec = { version = "1.6.1", features = ["const_generics"] }
 itertools = { version = "0.10.3", default-features = false }
 
