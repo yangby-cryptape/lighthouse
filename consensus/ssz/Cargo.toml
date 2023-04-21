@@ -10,7 +10,7 @@ license = "Apache-2.0"
 name = "ssz"
 
 [dev-dependencies]
-eth2_ssz_derive = { version = "0.3.0", path = "../ssz_derive" }
+eth2_ssz_derive = { version = "0.3.1", path = "../ssz_derive" }
 ethereum-types = { version = "0.14.1" }
 
 [dependencies]

@@ -8,6 +8,7 @@ mod duties_service;
 mod graffiti_file;
 mod http_metrics;
 mod key_cache;
+mod latency;
 mod notifier;
 mod preparation_service;
 mod signing_method;
@@ -31,6 +32,7 @@ use crate::beacon_node_fallback::{
 };
 use crate::doppelganger_service::DoppelgangerService;
 use crate::graffiti_file::GraffitiFile;
+use crate::initialized_validators::Error::UnableToOpenVotingKeystore;
 use account_utils::validator_definitions::ValidatorDefinitions;
 use attestation_service::{AttestationService, AttestationServiceBuilder};
 use block_service::{BlockService, BlockServiceBuilder};
@@ -92,6 +94,7 @@ pub struct ProductionValidatorClient<T: EthSpec> {
     doppelganger_service: Option<Arc<DoppelgangerService>>,
     preparation_service: PreparationService<SystemTimeSlotClock, T>,
     validator_store: Arc<ValidatorStore<SystemTimeSlotClock, T>>,
+    slot_clock: SystemTimeSlotClock,
     http_api_listen_addr: Option<SocketAddr>,
     config: Config,
 }
@@ -184,7 +187,16 @@ impl<T: EthSpec> ProductionValidatorClient<T> {
             log.clone(),
         )
         .await
-        .map_err(|e| format!("Unable to initialize validators: {:?}", e))?;
+        .map_err(|e| {
+            match e {
+                UnableToOpenVotingKeystore(err) => {
+                    format!("Unable to initialize validators: {:?}. If you have recently moved the location of your data directory \
+                    make sure to update the location of voting_keystore_path in your validator_definitions.yml", err)
+                },
+                err => {
+                    format!("Unable to initialize validators: {:?}", err)}
+                }
+            })?;
 
         let voting_pubkeys: Vec<_> = validators.iter_voting_pubkeys().collect();
 
@@ -412,6 +424,7 @@ impl<T: EthSpec> ProductionValidatorClient<T> {
             },
             spec: context.eth2_config.spec.clone(),
             context: duties_context,
+            enable_high_validator_count_metrics: config.enable_high_validator_count_metrics,
         });
 
         // Update the metrics server.
@@ -449,7 +462,7 @@ impl<T: EthSpec> ProductionValidatorClient<T> {
         let sync_committee_service = SyncCommitteeService::new(
             duties_service.clone(),
             validator_store.clone(),
-            slot_clock,
+            slot_clock.clone(),
             beacon_nodes.clone(),
             context.service_context("sync_committee".into()),
         );
@@ -470,6 +483,7 @@ impl<T: EthSpec> ProductionValidatorClient<T> {
             preparation_service,
             validator_store,
             config,
+            slot_clock,
             http_api_listen_addr: None,
         })
     }
@@ -532,6 +546,7 @@ impl<T: EthSpec> ProductionValidatorClient<T> {
                 graffiti_flag: self.config.graffiti,
                 spec: self.context.eth2_config.spec.clone(),
                 config: self.config.http_api.clone(),
+                slot_clock: self.slot_clock.clone(),
                 log: log.clone(),
                 _phantom: PhantomData,
             });
@@ -551,6 +566,14 @@ impl<T: EthSpec> ProductionValidatorClient<T> {
             info!(log, "HTTP API server is disabled");
             None
         };
+
+        if self.config.enable_latency_measurement_service {
+            latency::start_latency_service(
+                self.context.clone(),
+                self.duties_service.slot_clock.clone(),
+                self.duties_service.beacon_nodes.clone(),
+            );
+        }
 
         Ok(())
     }

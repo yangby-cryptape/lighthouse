@@ -662,7 +662,7 @@ impl<N: 'static + Unsigned> arbitrary::Arbitrary<'_> for Bitfield<Fixed<N>> {
         let size = N::to_usize();
         let mut vec = smallvec![0u8; size];
         u.fill_buffer(&mut vec)?;
-        Ok(Self::from_bytes(vec).map_err(|_| arbitrary::Error::IncorrectFormat)?)
+        Self::from_bytes(vec).map_err(|_| arbitrary::Error::IncorrectFormat)
     }
 }
 
@@ -674,7 +674,7 @@ impl<N: 'static + Unsigned> arbitrary::Arbitrary<'_> for Bitfield<Variable<N>> {
         let size = core::cmp::min(rand, max_size);
         let mut vec = smallvec![0u8; size];
         u.fill_buffer(&mut vec)?;
-        Ok(Self::from_bytes(vec).map_err(|_| arbitrary::Error::IncorrectFormat)?)
+        Self::from_bytes(vec).map_err(|_| arbitrary::Error::IncorrectFormat)
     }
 }
 

@@ -12,7 +12,7 @@ tree_hash_derive = { version = "0.4.0", path = "../tree_hash_derive" }
 types = { path = "../types" }
 beacon_chain = { path = "../../beacon_node/beacon_chain" }
 eth2_ssz = { version = "0.4.1", path = "../ssz" }
-eth2_ssz_derive = { version = "0.3.0", path = "../ssz_derive" }
+eth2_ssz_derive = { version = "0.3.1", path = "../ssz_derive" }
 
 [dependencies]
 ethereum-types = { version = "0.14.1", default-features = false, features = ["rlp", "serialize"] }
