@@ -6,11 +6,10 @@ use crate::{
     generic_signature::{TSignature, SIGNATURE_BYTES_LEN},
     Error, Hash256, ZeroizeHash, INFINITY_SIGNATURE,
 };
-pub use blst::min_pk as blst_core;
-use blst::{blst_scalar, BLST_ERROR};
-use rand::Rng;
-use std::iter::ExactSizeIterator;
-use std::vec::Vec;
+use alloc::vec::Vec;
+pub use ckb_blst::min_pk as blst_core;
+use ckb_blst::BLST_ERROR;
+use core::iter::ExactSizeIterator;
 
 pub const DST: &[u8] = b"BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
 pub const RAND_BITS: usize = 64;
@@ -35,88 +34,9 @@ pub type SignatureSet<'a> = crate::generic_signature_set::GenericSignatureSet<
 >;
 
 pub fn verify_signature_sets<'a>(
-    signature_sets: impl ExactSizeIterator<Item = &'a SignatureSet<'a>>,
+    _signature_sets: impl ExactSizeIterator<Item = &'a SignatureSet<'a>>,
 ) -> bool {
-    let sets = signature_sets.collect::<Vec<_>>();
-
-    if sets.is_empty() {
-        return false;
-    }
-
-    let rng = &mut rand::thread_rng();
-
-    let mut rands: Vec<blst_scalar> = Vec::with_capacity(sets.len());
-    let mut msgs_refs = Vec::with_capacity(sets.len());
-    let mut sigs = Vec::with_capacity(sets.len());
-    let mut pks = Vec::with_capacity(sets.len());
-
-    for set in &sets {
-        // Generate random scalars.
-        let mut vals = [0u64; 4];
-        while vals[0] == 0 {
-            // Do not use zero
-            vals[0] = rng.gen();
-        }
-        let mut rand_i = std::mem::MaybeUninit::<blst_scalar>::uninit();
-
-        // TODO: remove this `unsafe` code-block once we get a safe option from `blst`.
-        //
-        // https://github.com/sigp/lighthouse/issues/1720
-        unsafe {
-            blst::blst_scalar_from_uint64(rand_i.as_mut_ptr(), vals.as_ptr());
-            rands.push(rand_i.assume_init());
-        }
-
-        // Grab a slice of the message, to satisfy the blst API.
-        msgs_refs.push(set.message.as_bytes());
-
-        if let Some(point) = set.signature.point() {
-            // Subgroup check the signature
-            if !point.0.subgroup_check() {
-                return false;
-            }
-            // Convert the aggregate signature into a signature.
-            sigs.push(point.0.to_signature())
-        } else {
-            // Any "empty" signature should cause a signature failure.
-            return false;
-        }
-
-        // Sanity check.
-        if set.signing_keys.is_empty() {
-            // A signature that has no signing keys is invalid.
-            return false;
-        }
-
-        // Collect all the public keys into a point, to satisfy the blst API.
-        //
-        // Note: we could potentially have the `SignatureSet` take a pubkey point instead of a
-        // `GenericPublicKey` and avoid this allocation.
-        let signing_keys = set
-            .signing_keys
-            .iter()
-            .map(|pk| pk.point())
-            .collect::<Vec<_>>();
-
-        // Aggregate all the public keys.
-        // Public keys have already been checked for subgroup and infinity
-        let agg_pk = match blst_core::AggregatePublicKey::aggregate(&signing_keys, false) {
-            Ok(agg_pk) => agg_pk,
-            Err(_) => return false,
-        };
-        pks.push(agg_pk.to_public_key());
-    }
-
-    let (sig_refs, pks_refs): (Vec<_>, Vec<_>) = sigs.iter().zip(pks.iter()).unzip();
-
-    // Public keys have already been checked for subgroup and infinity
-    // Signatures have already been checked for subgroup
-    // Signature checks above could be done here for convienence as well
-    let err = blst_core::Signature::verify_multiple_aggregate_signatures(
-        &msgs_refs, DST, &pks_refs, false, &sig_refs, false, &rands, RAND_BITS,
-    );
-
-    err == blst::BLST_ERROR::BLST_SUCCESS
+    unimplemented!()
 }
 
 impl TPublicKey for blst_core::PublicKey {
@@ -260,10 +180,7 @@ impl TAggregateSignature<blst_core::PublicKey, BlstAggregatePublicKey, blst_core
 
 impl TSecretKey<blst_core::Signature, blst_core::PublicKey> for blst_core::SecretKey {
     fn random() -> Self {
-        let rng = &mut rand::thread_rng();
-        let ikm: [u8; 32] = rng.gen();
-
-        Self::key_gen(&ikm, &[]).unwrap()
+        unimplemented!()
     }
 
     fn public_key(&self) -> blst_core::PublicKey {

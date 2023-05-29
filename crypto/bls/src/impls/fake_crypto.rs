@@ -115,8 +115,8 @@ impl PartialEq for Signature {
 
 impl Eq for Signature {}
 
-impl std::hash::Hash for Signature {
-    fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {
+impl core::hash::Hash for Signature {
+    fn hash<H: core::hash::Hasher>(&self, hasher: &mut H) {
         self.0.hash(hasher);
     }
 }

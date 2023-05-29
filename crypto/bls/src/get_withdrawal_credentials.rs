@@ -1,4 +1,5 @@
 use crate::PublicKey;
+use alloc::{vec, vec::Vec};
 use eth2_hashing::hash;
 use ssz::Encode;
 

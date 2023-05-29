@@ -1,11 +1,12 @@
 use crate::generic_public_key_bytes::GenericPublicKeyBytes;
 use crate::Error;
+use alloc::{format, string::String, vec::Vec};
+use core::fmt;
+use core::hash::{Hash, Hasher};
 use eth2_serde_utils::hex::encode as hex_encode;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 use ssz::{Decode, Encode};
-use std::fmt;
-use std::hash::{Hash, Hasher};
 use tree_hash::TreeHash;
 
 /// The byte-length of a BLS public key when serialized in compressed form.
@@ -108,7 +109,7 @@ impl<Pub: TPublicKey> fmt::Display for GenericPublicKey<Pub> {
     impl_display!();
 }
 
-impl<Pub: TPublicKey> std::str::FromStr for GenericPublicKey<Pub> {
+impl<Pub: TPublicKey> core::str::FromStr for GenericPublicKey<Pub> {
     impl_from_str!();
 }
 

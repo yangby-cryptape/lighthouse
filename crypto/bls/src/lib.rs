@@ -19,6 +19,35 @@
 //! `impls.rs` module). When compiling with the `milagro` feature, we export
 //! `type PublicKey = GenericPublicKey<milagro::PublicKey>`.
 
+#![no_std]
+
+#[cfg(feature = "std")]
+extern crate std;
+
+extern crate alloc;
+
+#[cfg(any(
+    all(
+        feature = "supranational",
+        any(feature = "milagro", feature = "fake_crypto", feature = "ckb-vm")
+    ),
+    all(feature = "milagro", any(feature = "fake_crypto", feature = "ckb-vm")),
+    all(feature = "fake_crypto", feature = "ckb-vm"),
+))]
+compile_error!(
+    "only one feature in `supranational`, `milagro`, `fake_crypto`, `ckb-vm` could be enabled"
+);
+
+#[cfg(not(any(
+    feature = "supranational",
+    feature = "milagro",
+    feature = "fake_crypto",
+    feature = "ckb-vm"
+)))]
+compile_error!(
+    "at least one feature in `supranational`, `milagro`, `fake_crypto`, `ckb-vm` should be enabled"
+);
+
 #[macro_use]
 mod macros;
 mod generic_aggregate_public_key;
@@ -43,6 +72,8 @@ pub use zeroize_hash::ZeroizeHash;
 
 #[cfg(feature = "supranational")]
 use blst::BLST_ERROR as BlstError;
+#[cfg(feature = "ckb-vm")]
+use ckb_blst::BLST_ERROR as CkbBlstError;
 #[cfg(feature = "milagro")]
 use milagro_bls::AmclError;
 
@@ -56,6 +87,9 @@ pub enum Error {
     /// An error was raised from the Supranational BLST BLS library.
     #[cfg(feature = "supranational")]
     BlstError(BlstError),
+    /// An error was raised from the CKB BLST library.
+    #[cfg(feature = "ckb-vm")]
+    CkbBlstError(CkbBlstError),
     /// The provided bytes were an incorrect length.
     InvalidByteLength { got: usize, expected: usize },
     /// The provided secret key bytes were an incorrect length.
@@ -77,6 +111,13 @@ impl From<AmclError> for Error {
 impl From<BlstError> for Error {
     fn from(e: BlstError) -> Error {
         Error::BlstError(e)
+    }
+}
+
+#[cfg(feature = "ckb-vm")]
+impl From<CkbBlstError> for Error {
+    fn from(e: CkbBlstError) -> Error {
+        Error::CkbBlstError(e)
     }
 }
 
@@ -148,6 +189,8 @@ define_mod!(
     fake_crypto_implementations,
     crate::impls::fake_crypto::types
 );
+#[cfg(feature = "ckb-vm")]
+define_mod!(ckb_vm_implementations, crate::impls::ckb_vm::types);
 
 #[cfg(all(feature = "milagro", not(feature = "fake_crypto"),))]
 pub use milagro_implementations::*;
@@ -161,3 +204,6 @@ pub use blst_implementations::*;
 
 #[cfg(feature = "fake_crypto")]
 pub use fake_crypto_implementations::*;
+
+#[cfg(feature = "ckb-vm")]
+pub use ckb_vm_implementations::*;

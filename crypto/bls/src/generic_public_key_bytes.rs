@@ -2,14 +2,15 @@ use crate::{
     generic_public_key::{GenericPublicKey, TPublicKey},
     Error, PUBLIC_KEY_BYTES_LEN,
 };
+use alloc::{format, string::String, vec::Vec};
+use core::convert::TryInto;
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::marker::PhantomData;
 use eth2_serde_utils::hex::encode as hex_encode;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 use ssz::{Decode, Encode};
-use std::convert::TryInto;
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::marker::PhantomData;
 use tree_hash::TreeHash;
 
 /// A wrapper around some bytes that may or may not be a `PublicKey` in compressed form.
@@ -109,6 +110,21 @@ impl<Pub> Hash for GenericPublicKeyBytes<Pub> {
     }
 }
 
+impl<Pub> From<[u8; PUBLIC_KEY_BYTES_LEN]> for GenericPublicKeyBytes<Pub> {
+    fn from(pk_bytes: [u8; PUBLIC_KEY_BYTES_LEN]) -> Self {
+        Self {
+            bytes: pk_bytes,
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<Pub> Default for GenericPublicKeyBytes<Pub> {
+    fn default() -> Self {
+        Self::empty()
+    }
+}
+
 /// Serializes the `PublicKey` in compressed form, storing the bytes in the newly created `Self`.
 impl<Pub> From<GenericPublicKey<Pub>> for GenericPublicKeyBytes<Pub>
 where
@@ -160,7 +176,7 @@ impl<Pub> fmt::Display for GenericPublicKeyBytes<Pub> {
     impl_display!();
 }
 
-impl<Pub> std::str::FromStr for GenericPublicKeyBytes<Pub> {
+impl<Pub> core::str::FromStr for GenericPublicKeyBytes<Pub> {
     impl_from_str!();
 }
 

@@ -779,6 +779,7 @@ version = "0.2.0"
 dependencies = [
  "arbitrary",
  "blst",
+ "ckb-blst",
  "eth2_hashing",
  "eth2_serde_utils",
  "eth2_ssz",
@@ -1038,6 +1039,17 @@ checksum = "773f3b9af64447d2ce9850330c473515014aa235e6a783b02db81ff39e4a3dad"
 dependencies = [
  "crypto-common",
  "inout",
+]
+
+[[package]]
+name = "ckb-blst"
+version = "0.100.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23956c8f956fabab27aa20632fcefb1ab31f71544dab732c842064605932aea3"
+dependencies = [
+ "cc",
+ "glob",
+ "zeroize",
 ]
 
 [[package]]

@@ -3,14 +3,15 @@ use crate::{
     generic_signature::{GenericSignature, TSignature},
     Error, INFINITY_SIGNATURE, SIGNATURE_BYTES_LEN,
 };
+use alloc::{string::String, vec::Vec};
+use core::convert::TryInto;
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::marker::PhantomData;
 use eth2_serde_utils::hex::encode as hex_encode;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 use ssz::{Decode, Encode};
-use std::convert::TryInto;
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::marker::PhantomData;
 use tree_hash::TreeHash;
 
 /// A wrapper around some bytes that may or may not be a `GenericSignature` in compressed form.
@@ -135,7 +136,7 @@ impl<Pub, Sig> fmt::Display for GenericSignatureBytes<Pub, Sig> {
     impl_display!();
 }
 
-impl<Pub, Sig> std::str::FromStr for GenericSignatureBytes<Pub, Sig> {
+impl<Pub, Sig> core::str::FromStr for GenericSignatureBytes<Pub, Sig> {
     impl_from_str!();
 }
 

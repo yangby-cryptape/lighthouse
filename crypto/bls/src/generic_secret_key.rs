@@ -3,7 +3,7 @@ use crate::{
     generic_signature::{GenericSignature, TSignature},
     Error, Hash256, ZeroizeHash,
 };
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 /// The byte-length of a BLS secret key.
 pub const SECRET_KEY_BYTES_LEN: usize = 32;

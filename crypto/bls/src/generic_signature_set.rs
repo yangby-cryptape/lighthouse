@@ -5,8 +5,9 @@ use crate::{
     generic_signature::{GenericSignature, TSignature},
     Hash256,
 };
-use std::borrow::Cow;
-use std::marker::PhantomData;
+use alloc::borrow::Cow;
+use alloc::{vec, vec::Vec};
+use core::marker::PhantomData;
 
 /// A generic way to represent a `GenericSignature` or `GenericAggregateSignature`.
 pub struct WrappedSignature<'a, Pub, AggPub, Sig, AggSig>

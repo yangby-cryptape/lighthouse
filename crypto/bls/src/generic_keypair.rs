@@ -3,8 +3,8 @@ use crate::{
     generic_secret_key::{GenericSecretKey, TSecretKey},
     generic_signature::TSignature,
 };
-use std::fmt;
-use std::marker::PhantomData;
+use core::fmt;
+use core::marker::PhantomData;
 
 /// A simple wrapper around `PublicKey` and `GenericSecretKey`.
 #[derive(Clone)]

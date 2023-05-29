@@ -2,8 +2,8 @@ use crate::{
     generic_public_key::{GenericPublicKey, TPublicKey},
     Error,
 };
-use std::fmt::{self, Debug};
-use std::marker::PhantomData;
+use core::fmt::{self, Debug};
+use core::marker::PhantomData;
 
 /// Implemented on some struct from a BLS library so it may be used internally in this crate.
 pub trait TAggregatePublicKey<Pub>: Sized + Clone {

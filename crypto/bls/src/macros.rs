@@ -63,6 +63,8 @@ macro_rules! impl_ssz_decode {
         }
 
         fn from_ssz_bytes(bytes: &[u8]) -> Result<Self, ssz::DecodeError> {
+            use crate::alloc::format;
+
             let len = bytes.len();
             let expected = <Self as ssz::Decode>::ssz_fixed_len();
 
@@ -95,6 +97,7 @@ macro_rules! impl_from_str {
         type Err = String;
 
         fn from_str(s: &str) -> Result<Self, Self::Err> {
+            use crate::alloc::{format, string::ToString};
             if let Some(stripped) = s.strip_prefix("0x") {
                 let bytes = hex::decode(stripped).map_err(|e| e.to_string())?;
                 Self::deserialize(&bytes[..]).map_err(|e| format!("{:?}", e))
@@ -114,6 +117,7 @@ macro_rules! impl_serde_serialize {
         where
             S: Serializer,
         {
+            use crate::alloc::string::ToString;
             serializer.serialize_str(&self.to_string())
         }
     };
@@ -141,12 +145,13 @@ macro_rules! impl_serde_deserialize {
                 where
                     E: serde::de::Error,
                 {
+                    use crate::alloc::string::ToString;
                     Ok(value.to_string())
                 }
             }
 
             let string = deserializer.deserialize_str(StringVisitor)?;
-            <Self as std::str::FromStr>::from_str(&string).map_err(serde::de::Error::custom)
+            <Self as core::str::FromStr>::from_str(&string).map_err(serde::de::Error::custom)
         }
     };
 }

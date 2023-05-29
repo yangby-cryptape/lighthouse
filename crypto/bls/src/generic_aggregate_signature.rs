@@ -4,13 +4,14 @@ use crate::{
     generic_signature::{GenericSignature, TSignature},
     Error, Hash256, INFINITY_SIGNATURE, SIGNATURE_BYTES_LEN,
 };
+use alloc::{string::String, vec::Vec};
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::marker::PhantomData;
 use eth2_serde_utils::hex::encode as hex_encode;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 use ssz::{Decode, Encode};
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::marker::PhantomData;
 use tree_hash::TreeHash;
 
 /// The compressed bytes used to represent `GenericAggregateSignature::empty()`.
@@ -285,7 +286,7 @@ where
     impl_display!();
 }
 
-impl<Pub, AggPub, Sig, AggSig> std::str::FromStr
+impl<Pub, AggPub, Sig, AggSig> core::str::FromStr
     for GenericAggregateSignature<Pub, AggPub, Sig, AggSig>
 where
     Sig: TSignature<Pub>,

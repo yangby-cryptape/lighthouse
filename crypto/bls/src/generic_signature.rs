@@ -2,13 +2,14 @@ use crate::{
     generic_public_key::{GenericPublicKey, TPublicKey},
     Error, Hash256,
 };
+use alloc::{string::String, vec::Vec};
+use core::fmt;
+use core::hash::{Hash, Hasher};
+use core::marker::PhantomData;
 use eth2_serde_utils::hex::encode as hex_encode;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 use ssz::{Decode, Encode};
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::marker::PhantomData;
 use tree_hash::TreeHash;
 
 /// The byte-length of a BLS signature when serialized in compressed form.
@@ -169,7 +170,7 @@ impl<PublicKey, T: TSignature<PublicKey>> fmt::Display for GenericSignature<Publ
     impl_display!();
 }
 
-impl<PublicKey, T: TSignature<PublicKey>> std::str::FromStr for GenericSignature<PublicKey, T> {
+impl<PublicKey, T: TSignature<PublicKey>> core::str::FromStr for GenericSignature<PublicKey, T> {
     impl_from_str!();
 }
 

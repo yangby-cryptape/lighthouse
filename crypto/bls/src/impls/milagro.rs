@@ -9,6 +9,7 @@ use crate::{
 pub use milagro_bls as milagro;
 use rand::thread_rng;
 use std::iter::ExactSizeIterator;
+use std::vec::Vec;
 
 /// Provides the externally-facing, core BLS types.
 pub mod types {
