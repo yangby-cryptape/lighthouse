@@ -82,6 +82,40 @@ pub struct LightClientUpdate<T: EthSpec> {
     pub signature_slot: Slot,
 }
 
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+#[derive(Serialize, Deserialize)]
+pub struct LightClientHeader {
+    pub beacon: BeaconBlockHeader,
+}
+
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+#[derive(Serialize, Deserialize)]
+#[serde(bound = "T: EthSpec")]
+pub struct PatchedLightClientUpdate<T: EthSpec> {
+    pub attested_header: LightClientHeader,
+    pub next_sync_committee: Arc<SyncCommittee<T>>,
+    pub next_sync_committee_branch: FixedVector<Hash256, NextSyncCommitteeProofLen>,
+    pub finalized_header: LightClientHeader,
+    pub finality_branch: FixedVector<Hash256, FinalizedRootProofLen>,
+    pub sync_aggregate: SyncAggregate<T>,
+    pub signature_slot: Slot,
+}
+
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+impl<T: EthSpec> core::convert::From<PatchedLightClientUpdate<T>> for LightClientUpdate<T> {
+    fn from(patched: PatchedLightClientUpdate<T>) -> Self {
+        Self {
+            attested_header: patched.attested_header.beacon,
+            next_sync_committee: patched.next_sync_committee,
+            next_sync_committee_branch: patched.next_sync_committee_branch,
+            finalized_header: patched.finalized_header.beacon,
+            finality_branch: patched.finality_branch,
+            sync_aggregate: patched.sync_aggregate,
+            signature_slot: patched.signature_slot,
+        }
+    }
+}
+
 impl<T: EthSpec> LightClientUpdate<T> {
     pub fn new(
         chain_spec: ChainSpec,

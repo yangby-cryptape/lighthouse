@@ -36,6 +36,38 @@ pub struct LightClientFinalityUpdate<T: EthSpec> {
     pub signature_slot: Slot,
 }
 
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+#[derive(Serialize, Deserialize)]
+pub struct LightClientHeader {
+    pub beacon: BeaconBlockHeader,
+}
+
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+#[derive(Serialize, Deserialize)]
+#[serde(bound = "T: EthSpec")]
+pub struct PatchedLightClientFinalityUpdate<T: EthSpec> {
+    pub attested_header: LightClientHeader,
+    pub finalized_header: LightClientHeader,
+    pub finality_branch: FixedVector<Hash256, FinalizedRootProofLen>,
+    pub sync_aggregate: SyncAggregate<T>,
+    pub signature_slot: Slot,
+}
+
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+impl<T: EthSpec> core::convert::From<PatchedLightClientFinalityUpdate<T>>
+    for LightClientFinalityUpdate<T>
+{
+    fn from(patched: PatchedLightClientFinalityUpdate<T>) -> Self {
+        Self {
+            attested_header: patched.attested_header.beacon,
+            finalized_header: patched.finalized_header.beacon,
+            finality_branch: patched.finality_branch,
+            sync_aggregate: patched.sync_aggregate,
+            signature_slot: patched.signature_slot,
+        }
+    }
+}
+
 impl<T: EthSpec> LightClientFinalityUpdate<T> {
     pub fn new(
         chain_spec: &ChainSpec,

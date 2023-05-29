@@ -30,6 +30,32 @@ pub struct LightClientBootstrap<T: EthSpec> {
     pub current_sync_committee_branch: FixedVector<Hash256, CurrentSyncCommitteeProofLen>,
 }
 
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+#[derive(Serialize, Deserialize)]
+pub struct LightClientHeader {
+    pub beacon: BeaconBlockHeader,
+}
+
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+#[derive(Serialize, Deserialize)]
+#[serde(bound = "T: EthSpec")]
+pub struct PatchedLightClientBootstrap<T: EthSpec> {
+    pub header: LightClientHeader,
+    pub current_sync_committee: Arc<SyncCommittee<T>>,
+    pub current_sync_committee_branch: FixedVector<Hash256, CurrentSyncCommitteeProofLen>,
+}
+
+// TODO Removed after https://github.com/sigp/lighthouse/pull/3886 merged.
+impl<T: EthSpec> core::convert::From<PatchedLightClientBootstrap<T>> for LightClientBootstrap<T> {
+    fn from(patched: PatchedLightClientBootstrap<T>) -> Self {
+        Self {
+            header: patched.header.beacon,
+            current_sync_committee: patched.current_sync_committee,
+            current_sync_committee_branch: patched.current_sync_committee_branch,
+        }
+    }
+}
+
 impl<T: EthSpec> LightClientBootstrap<T> {
     pub fn from_beacon_state(beacon_state: &mut BeaconState<T>) -> Result<Self, Error> {
         let mut header = beacon_state.latest_block_header().clone();
