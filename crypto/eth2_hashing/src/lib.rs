@@ -24,6 +24,14 @@ use lazy_static::lazy_static;
 /// Length of a SHA256 hash in bytes.
 pub const HASH_LEN: usize = 32;
 
+#[doc(hidden)]
+#[cfg(feature = "dynamic-impl")]
+pub const EXPECTED_CONTEXT_SIZE: usize = 224;
+
+#[doc(hidden)]
+#[cfg(not(feature = "dynamic-impl"))]
+pub const EXPECTED_CONTEXT_SIZE: usize = 120;
+
 /// Returns the digest of `input` using the best available implementation.
 pub fn hash(input: &[u8]) -> Vec<u8> {
     DynamicImpl::best().hash(input)

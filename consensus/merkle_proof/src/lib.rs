@@ -399,6 +399,9 @@ impl MerkleTree {
             left.print_node(space);
         }
     }
+
+    #[cfg(not(feature = "std"))]
+    pub fn print_node(&self, _space: u32) {}
 }
 
 /// Verify a proof that `leaf` exists at `index` in a Merkle tree rooted at `root`.

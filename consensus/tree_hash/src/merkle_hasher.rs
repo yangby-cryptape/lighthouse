@@ -371,7 +371,7 @@ mod test {
     fn context_size() {
         assert_eq!(
             mem::size_of::<HalfNode>(),
-            224,
+            eth2_hashing::EXPECTED_CONTEXT_SIZE,
             "Halfnode size should be as expected"
         );
     }
